@@ -1,7 +1,6 @@
 import pandas as pd
 import requests
 import datetime
-import os
 
 
 def get_data(year):
@@ -24,35 +23,40 @@ def get_url(year):
 
 
 def get_cookies():
-    session_cookie = os.environ.get('SESSION_COOKIE')
-    return {'session': session_cookie}
+    with open('data/session_cookie.txt', 'r') as f:
+        return {'session': f.read()}
 
 
 def get_table(data):
     df = pd.json_normalize(data['members'].values())
+    df.drop(columns={col for col in df.columns if 'star_index' in col}, inplace=True)
     df = df[['name', 'local_score', 'stars'] + list(sorted(df.columns[6:], key=lambda x: float(x[21:-12])))]
     df.columns = ['name', 'score', 'stars'] + [col[21:-12] for col in df.columns[3:]]
 
     local_time = + 1  # CEST
 
     df = df.sort_values(['stars', 'score'], ascending=False)
-    df.index = range(1, df.shape[0] + 1)
+    df.index = range(1, df.shape[0]+1)
 
     acc_times = pd.DataFrame(data=df[['name', 'score', 'stars']])
     df['accumulated_time'] = pd.Timedelta(0)
-    for i in range(3, df.shape[1] - 1):
+    
+    for i in range(3, df.shape[1]-1):
+        print(df[df.columns[i]])
         df[df.columns[i]] = pd.to_datetime(df[df.columns[i]], unit='s') + pd.Timedelta(local_time, unit='H')
         if i % 2 == 0:
-            df[df.columns[i]] -= df[df.columns[i - 1]]
-            margin = sorted(df[df.columns[i]], reverse=True)[1]
+            df[df.columns[i]] -= df[df.columns[i-1]]
+            if df.columns[i] == '21.2':
+                df.loc[df.name=='Antonio Tigri', '21.2'] = pd.Timedelta(2*60+45, unit='m')
+            margin = sorted(df[df.columns[i]].dropna(), reverse=True)[1]
             for idx in df.index:
                 if df.at[idx, df.columns[i]] > max(datetime.timedelta(hours=1), 1.5 * margin):
-                    print(f'updating {df.columns[i]} from {idx} from {df.at[idx, df.columns[i]]} to {1.5 * margin}')
+                    print(f'updating {df.columns[i]} from {idx} from {df.at[idx, df.columns[i]]} to {1.5*margin}')
                     df.at[idx, df.columns[i]] = 1.5 * margin
             df['accumulated_time'] += df[df.columns[i]]
-
+            
             day = df.columns[i].split('.')[0]
-            prev_day = str(int(day) - 1)
+            prev_day = str(int(day)-1)
             acc_times[day] = df[df.columns[i]] if prev_day not in acc_times else acc_times[prev_day] + df[df.columns[i]]
 
     return df, acc_times

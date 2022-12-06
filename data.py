@@ -8,21 +8,16 @@ import os
 def get_data(year, user):
     try:
         json_data = get_json(year, user)
-        with open(f'data_{year}_{user}.json', 'w') as f:
+        with open(f'data/{year}_{user}.json', 'w') as f:
             json.dump(json_data, f)
     except:
-        with open(f'data_{year}_{user}.json', 'r') as f:
+        with open(f'data/{year}_{user}.json', 'r') as f:
             json_data = json.load(f)
         print('Used cached data')
     return get_table(json_data)
 
 
-def get_paths(year):
-    return f'data/df{year}.csv', f'data/acc_times{year}.csv'
-
-
 def get_json(year, user):
-    raise Exception
     request = requests.get(get_url(year, user), cookies=get_cookies())
     return request.json()
 

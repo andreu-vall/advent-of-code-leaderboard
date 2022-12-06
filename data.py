@@ -1,11 +1,19 @@
 import pandas as pd
 import requests
 import datetime
+import json
 import os
 
 
 def get_data(year, user):
-    json_data = get_json(year, user)
+    try:
+        json_data = get_json(year, user)
+        with open(f'data_{year}_{user}.json', 'w') as f:
+            json.dump(json_data, f)
+    except:
+        with open(f'data_{year}_{user}.json', 'r') as f:
+            json_data = json.load(f)
+        print('Used cached data')
     return get_table(json_data)
 
 
@@ -14,6 +22,7 @@ def get_paths(year):
 
 
 def get_json(year, user):
+    raise Exception
     request = requests.get(get_url(year, user), cookies=get_cookies())
     return request.json()
 
@@ -48,7 +57,7 @@ def get_table(data):
             for idx in df.index:
                 if df.at[idx, df.columns[i]] > max(datetime.timedelta(hours=1), 1.5 * margin):
                     print(f'updating {df.columns[i]} from {idx} from {df.at[idx, df.columns[i]]} to {1.5 * margin}')
-                    df.at[idx, df.columns[i]] = 1.5 * margin
+                    df.at[idx, df.columns[i]] = max(1.5 * margin, datetime.timedelta(hours=1))
             df['accumulated_time'] += df[df.columns[i]]
 
             day = df.columns[i].split('.')[0]

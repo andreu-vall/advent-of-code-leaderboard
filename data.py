@@ -4,8 +4,8 @@ import datetime
 import os
 
 
-def get_data(year):
-    json_data = get_json(year)
+def get_data(year, user):
+    json_data = get_json(year, user)
     return get_table(json_data)
 
 
@@ -13,14 +13,13 @@ def get_paths(year):
     return f'data/df{year}.csv', f'data/acc_times{year}.csv'
 
 
-def get_json(year):
-    request = requests.get(get_url(year), cookies=get_cookies())
+def get_json(year, user):
+    request = requests.get(get_url(year, user), cookies=get_cookies())
     return request.json()
 
 
-def get_url(year):
-    user_id = {2021: 1075819, 2020: 1066392}
-    return f'https://adventofcode.com/{year}/leaderboard/private/view/{user_id[year]}.json'
+def get_url(year, user):
+    return f'https://adventofcode.com/{year}/leaderboard/private/view/{user}.json'
 
 
 def get_cookies():
@@ -45,7 +44,7 @@ def get_table(data):
         df[df.columns[i]] = pd.to_datetime(df[df.columns[i]], unit='s') + pd.Timedelta(local_time, unit='H')
         if i % 2 == 0:
             df[df.columns[i]] -= df[df.columns[i - 1]]
-            margin = sorted(df[df.columns[i]], reverse=True)[1]
+            margin = sorted(df[df.columns[i]], reverse=True)[2]
             for idx in df.index:
                 if df.at[idx, df.columns[i]] > max(datetime.timedelta(hours=1), 1.5 * margin):
                     print(f'updating {df.columns[i]} from {idx} from {df.at[idx, df.columns[i]]} to {1.5 * margin}')

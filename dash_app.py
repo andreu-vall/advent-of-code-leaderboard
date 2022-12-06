@@ -15,9 +15,11 @@ app.layout = html.Div([
 
     dcc.Dropdown(id='select_year',
                  options=[
-                     {'label': '2020', 'value': 2020},
-                     {'label': '2021', 'value': 2021}],
-                 value=2021
+                     {'label': '2020', 'value': 1},
+                     {'label': '2021', 'value': 2},
+                     {'label': '2022 Doble', 'value': 3},
+                     {'label': '2022 GDSC', 'value': 4}],
+                 value=3
                  ),
 
     dcc.Graph(id='first_graph'),
@@ -32,8 +34,8 @@ app.layout = html.Div([
      Output(component_id='third_graph', component_property='figure')],
     [Input(component_id='select_year', component_property='value')]
 )
-def update_graph(year):
-    return generate_figures(year)
+def update_graph(version):
+    return generate_figures(version)
 
 
 if __name__ == '__main__':

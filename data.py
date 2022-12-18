@@ -44,15 +44,21 @@ def get_table(data):
 
     acc_times = pd.DataFrame(data=df[['name', 'score', 'stars']])
     df['accumulated_time'] = pd.Timedelta(0)
+
     for i in range(3, df.shape[1] - 1):
         df[df.columns[i]] = pd.to_datetime(df[df.columns[i]], unit='s') + pd.Timedelta(local_time, unit='H')
         if i % 2 == 0:
-            df[df.columns[i]] -= df[df.columns[i - 1]]
-            margin = sorted(df[df.columns[i]], reverse=True)[2]
-            for idx in df.index:
-                if df.at[idx, df.columns[i]] > max(datetime.timedelta(hours=1), 1.5 * margin):
-                    print(f'updating {df.columns[i]} from {idx} from {df.at[idx, df.columns[i]]} to {1.5 * margin}')
-                    df.at[idx, df.columns[i]] = max(1.5 * margin, datetime.timedelta(hours=1))
+            df[df.columns[i]] -= df[df.columns[i-1]]
+            idx_prev = None
+            for idx in df.sort_values(df.columns[i]).index:
+                if idx_prev != None:
+                    prev_time = df.at[idx_prev, df.columns[i]]
+                    time = df.at[idx, df.columns[i]]
+                    adjusted = max(prev_time + datetime.timedelta(minutes=15), 1.5 * prev_time)
+                    if time > adjusted:
+                        print(f'updating {df.columns[i]} of {df.at[idx, "name"]} from {df.at[idx, df.columns[i]]} to {adjusted}')
+                        df.at[idx, df.columns[i]] = adjusted
+                idx_prev = idx
             df['accumulated_time'] += df[df.columns[i]]
 
             day = df.columns[i].split('.')[0]

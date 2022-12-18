@@ -11,7 +11,9 @@ app.layout = html.Div([
 
     html.H1('Advent of Code Leaderboard'),
 
-    html.P('Real time interactive plots from Advent of Code'),
+    html.P(
+        ['Real time interactive plots from Advent of Code. You can check out the code at ',
+        html.A("GitHub", href = "https://github.com/andreu-vall/advent-of-code-leaderboard")]),
 
     dcc.Dropdown(id='select_year',
                  options=[

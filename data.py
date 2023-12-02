@@ -3,6 +3,7 @@ import requests
 import datetime
 import json
 import os
+from dotenv import load_dotenv
 
 
 def get_data(year, user):
@@ -23,6 +24,7 @@ def get_json(year, user):
 
 
 def get_url(year, user):
+    load_dotenv()
     return f'https://adventofcode.com/{year}/leaderboard/private/view/{user}.json'
 
 

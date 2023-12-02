@@ -1,11 +1,14 @@
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
 from plots import generate_figures
+from dash_bootstrap_templates import load_figure_template
 
 
 app = Dash()
 app.title = 'AoC Leaderboard'
 server = app.server
+
+#load_figure_template('plotly_dark')
 
 app.layout = html.Div([
 
@@ -20,8 +23,9 @@ app.layout = html.Div([
                      {'label': '2020', 'value': 1},
                      {'label': '2021', 'value': 2},
                      {'label': '2022 Doble', 'value': 3},
-                     {'label': '2022 GDSC', 'value': 4}],
-                 value=3
+                     {'label': '2022 GDSC', 'value': 4},
+                     {'label': '2023', 'value': 5}],
+                 value=5
                  ),
 
     dcc.Graph(id='first_graph'),

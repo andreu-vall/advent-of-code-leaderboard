@@ -5,8 +5,8 @@ import data
 
 
 def generate_figures(version):
-    year = {1: 2020, 2: 2021, 3: 2022, 4: 2022}[version]
-    user = {1: 1066392, 2: 1075819, 3: 1075819, 4: 1621551}[version]
+    year = {1: 2020, 2: 2021, 3: 2022, 4: 2022, 5: 2023}[version]
+    user = {1: 1066392, 2: 1075819, 3: 1075819, 4: 1621551, 5: 1075819}[version]
     df, acc_times = data.get_data(year, user)
     n_days = int(df.columns[-2].split('.')[0])
     figure1 = generate_figure1(df, year, n_days)

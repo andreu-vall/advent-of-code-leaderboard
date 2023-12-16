@@ -22,11 +22,12 @@ def generate_figure1(df, year, n_days):
     times_data = []
     for _, row in df.iterrows():
         for day in range(1, n_days + 1):
-            date = row[f'{day}.1']
-            if not pd.isnull(date):
-                time = date - pd.Timedelta(day - 1, unit='d')
-                if time < too_far:
-                    times_data.append({'name': row['name'], 'day': day, 'time': time})
+            if f'{day}.1' in row:
+                date = row[f'{day}.1']
+                if not pd.isnull(date):
+                    time = date - pd.Timedelta(day - 1, unit='d')
+                    if time < too_far:
+                        times_data.append({'name': row['name'], 'day': day, 'time': time})
 
     times = pd.DataFrame(times_data)
 
